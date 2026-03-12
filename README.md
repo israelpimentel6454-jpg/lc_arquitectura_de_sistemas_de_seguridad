@@ -3,7 +3,7 @@
 
 > Repositorio oficial de la materia. Aquí encontrarás guías de estudio,
 > laboratorios, presentaciones y recursos para cada unidad del curso.
-    
+
 ---
 
 ##  Docente
@@ -72,7 +72,7 @@ semanales y ejercicios de Red y Blue Team.
 ## Entorno de laboratorio
 
 El **60% del curso** se desarrolla en laboratorio. Todos los labs se
-realizan en una máquina virtual de **Kali Linux 2024.4** sobre
+realizan en una máquina virtual de **Kali Linux 2025.4** sobre
 **Oracle VirtualBox 7**.
 
 Consulta la guía de preparación del entorno antes de la primera sesión:
