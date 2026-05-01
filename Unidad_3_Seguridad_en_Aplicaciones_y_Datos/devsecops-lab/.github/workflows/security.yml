@@ -91,13 +91,30 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      # Paso 2: configurar la versión de Python en el runner.
-      # La action "setup-python" hace disponible el comando python y pip.
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Instalar y ejecutar pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt --format=json --output=audit-report.json || true
+          echo '--- Reporte de CVEs encontrados ---'
+          pip-audit -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt || true
+
+      - name: Guardar reporte de auditoria
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pip-audit-report
+          path: audit-report.json
+  
+  
+      # Paso 2: configurar la versión de Python en el runner.
+      # La action "setup-python" hace disponible el comando python y pip.
+      
+      
       # TODO ▼ ─────────────────────────────────────────────────────────────
       # Paso 3: instalar pip-audit y ejecutar la auditoría.
       #
@@ -120,10 +137,11 @@ jobs:
   # Herramienta: pytest — ejecuta las pruebas unitarias del proyecto.
   # Esta etapa corre DESPUÉS de las etapas anteriores (ver "needs").
   # ═══════════════════════════════════════════════════════════════════════════
+
   tests:
-    name: Tests - pytest
+    name: Unit Tests - Pytest
     runs-on: ubuntu-latest
-    needs: [ sast, sca ]   # espera a que SAST y SCA terminen primero
+    needs: [sast, sca]
 
     steps:
       - name: Checkout del repositorio
@@ -134,22 +152,24 @@ jobs:
         with:
           python-version: "3.11"
 
-      # TODO ▼ ─────────────────────────────────────────────────────────────
-      # Paso 3: instalar las dependencias e instalar pytest.
-      #
-      # Necesitas dos comandos:
-      #   a) instalar los paquetes de app/requirements.txt
-      #   b) instalar pytest (si no viene en requirements.txt)
-      #
-      # Luego ejecuta pytest indicando la carpeta tests/.
-      # Agrega -v para ver el detalle de cada test.
-      #
-      # Pregunta: ¿qué pasa si un test falla? ¿Se bloquea el merge del PR?
       - name: Instalar dependencias
         run: |
-          # TODO: instala las dependencias del proyecto
-          # TODO: instala pytest
+          pip install -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt
+          pip install pytest
 
       - name: Ejecutar tests
+        run: pytest Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/tests/ -v
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Resumen del Pipeline
+  # ═══════════════════════════════════════════════════════════════════════════
+  pipeline-status:
+    name: Estatus Final
+    runs-on: ubuntu-latest
+    needs: [sast, sca, tests]
+    if: always() 
+    steps:
+      - name: Check Status
         run: |
-          # TODO: ejecuta pytest sobre la carpeta tests/
+          echo "¡El ciclo de DevSecOps ha terminado su ejecución!"
+ 
