@@ -28,7 +28,7 @@ jobs:
   # vulnerables sin ejecutar la aplicación.
   # ═══════════════════════════════════════════════════════════════════════════
   sast:
-    name: SAST - Semgrep
+    name: 'SAST - Semgrep'
     runs-on: ubuntu-latest
 
     steps:
