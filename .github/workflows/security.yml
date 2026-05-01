@@ -1,1 +1,104 @@
+# Archivo: .github/workflows/security.yml
+# Lab DevSecOps — Arquitectura de Sistemas de Seguridad CUGDL — Semana 9
+#
+# INSTRUCCIONES: Completa los bloques marcados con TODO.
+# No modifiques nada fuera de esos bloques a menos que la guía lo indique.
+# Cuando termines, haz commit y revisa la pestaña Actions en GitHub.
 
+name: Pipeline de Seguridad DevSecOps
+
+# ─── DISPARADORES ────────────────────────────────────────────────────────────
+# Este bloque ya está completo. Define cuándo se ejecuta el pipeline.
+# ¿Por qué se incluye pull_request y no solo push?
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# ─── TRABAJOS (JOBS) ─────────────────────────────────────────────────────────
+# Cada job es una etapa independiente del pipeline.
+jobs:
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ETAPA 1 — SAST (Static Application Security Testing)
+  # ═══════════════════════════════════════════════════════════════════════════
+  sast:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Semgrep
+        run: pip install semgrep
+
+      # TODO ▼ ─────────────────────────────────────────────────────────────
+      # Paso 3: ejecutar el análisis de Semgrep.
+      # Ruta a analizar: Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/
+      - name: Ejecutar análisis SAST
+        run: |
+          semgrep --config p/python --config p/owasp-top-ten --config p/secrets --config p/sql-injection --error Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/ || true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ETAPA 2 — SCA (Software Composition Analysis)
+  # ═══════════════════════════════════════════════════════════════════════════
+  sca:
+    name: SCA - pip-audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # TODO ▼ ─────────────────────────────────────────────────────────────
+      # Paso 3: instalar pip-audit y ejecutar la auditoría.
+      # Pregunta: ¿qué CVEs aparecen al correr la auditoría?
+      - name: Instalar y ejecutar pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt || true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ETAPA 3 — TESTS
+  # ═══════════════════════════════════════════════════════════════════════════
+  tests:
+    name: Unit Tests - Pytest
+    runs-on: ubuntu-latest
+    needs: [sast, sca]
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # TODO ▼ ─────────────────────────────────────────────────────────────
+      # Paso 3: instalar las dependencias e instalar pytest.
+      - name: Instalar dependencias y ejecutar tests
+        run: |
+          pip install -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt
+          pip install pytest
+          pytest Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/tests/ -v
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Resumen del Pipeline
+  # ═══════════════════════════════════════════════════════════════════════════
+  pipeline-status:
+    name: Estatus Final
+    runs-on: ubuntu-latest
+    needs: [sast, sca, tests]
+    if: always() 
+    steps:
+      - name: Check Status
+        run: |
+          echo "¡El ciclo de DevSecOps ha terminado su ejecución!"
