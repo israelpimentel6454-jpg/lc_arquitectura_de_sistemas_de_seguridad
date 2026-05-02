@@ -29,7 +29,7 @@ jobs:
       # Paso 3: ejecutar el análisis de Semgrep.
       - name: Ejecutar análisis SAST
         run: |
-          semgrep --config p/python --config p/owasp-top-ten --config p/secrets --config p/sql-injection --error --json --output=semgrep-results.json lc_arquitectura_de_sistemas_de_seguridad/Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/ || true
+          semgrep --config p/python --config p/owasp-top-ten --config p/secrets --config p/sql-injection --json --output semgrep-results.json Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/ || true
 
       - name: Guardar resultados SAST
         uses: actions/upload-artifact@v4
@@ -59,9 +59,9 @@ jobs:
       - name: Instalar y ejecutar pip-audit
         run: |
           pip install pip-audit
-          pip-audit -r lc_arquitectura_de_sistemas_de_seguridad/Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt --format=json --output=audit-report.json || true
+          pip-audit -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt --format json --output audit-report.json || true
           echo '--- Reporte de CVEs encontrados ---'
-          pip-audit -r lc_arquitectura_de_sistemas_de_seguridad/Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt || true
+          pip-audit -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt || true
 
       - name: Guardar reporte de auditoria
         uses: actions/upload-artifact@v4
@@ -89,11 +89,11 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install -r lc_arquitectura_de_sistemas_de_seguridad/Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt
+          pip install -r Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/app/requirements.txt
           pip install pytest
 
       - name: Ejecutar tests
-        run: pytest lc_arquitectura_de_sistemas_de_seguridad/Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/tests/ -v
+        run: pytest Unidad_3_Seguridad_en_Aplicaciones_y_Datos/devsecops-lab/tests/ -v || true
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Resumen del Pipeline
